@@ -15,28 +15,26 @@ async function getHibpBreaches(u=HIBP_BREACHES_URL) {
   return (await got(u, {json: true})).body;
 }
 
+function ftlToJson(ftl) {
+  return parse(ftl).body;
+}
+
 function getFtlDataClassesLocal(p) {
-  const ftlToJsonLocal = (p) => {
-    const res = readFile(p, "utf-8");
-    return parse(res).body;
-  };
-  return ftlToJsonLocal(p)
+  const file = readFile(p, "utf-8");
+  return ftlToJson(file)
     .reduce(ftlReducer, new Map());
 }
 
 async function getFtlDataClassesRemote(u) {
-  const ftlToJsonRemote = async (u) => {
-    const res = (await got(u)).body;
-    return parse(res).body;
-  };
-  return (await ftlToJsonRemote(u))
+  const file = (await got(u)).body;
+  return ftlToJson(file)
     .reduce(ftlReducer, new Map());
 }
 
-function ftlReducer(list, item) {
-  if (item.type === "Message") {
-    const slug = item.id.name;
-    const dataClass = item.value.elements.map(({value}) => value.replace("’", "'")).join("");
+function ftlReducer(list, {type, id, value}) {
+  if (type === "Message") {
+    const slug = id.name;
+    const dataClass = value.elements.map(({value}) => value.replace("’", "'")).join("");
     list.set(dataClass, slug);
   }
   return list;
