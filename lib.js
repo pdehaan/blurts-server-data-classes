@@ -8,27 +8,27 @@ const HIBP_BREACHES_URL = "https://haveibeenpwned.com/api/v2/breaches";
 module.exports = {
   getFtlDataClassesLocal,
   getFtlDataClassesRemote,
-  getHibpBreaches
+  getMissingDataClasses
 };
 
-async function getHibpBreaches(u=HIBP_BREACHES_URL) {
-  return (await got(u, {json: true})).body;
+async function fetch(url, options={}) {
+  const {body} = await got(url, options);
+  return body;
 }
 
-function ftlToJson(ftl) {
-  return parse(ftl).body;
+function dataClassMap(ftl) {
+  const res = parse(ftl).body;
+  return res.reduce(ftlReducer, new Map());
 }
 
 function getFtlDataClassesLocal(p) {
   const file = readFile(p, "utf-8");
-  return ftlToJson(file)
-    .reduce(ftlReducer, new Map());
+  return dataClassMap(file);
 }
 
 async function getFtlDataClassesRemote(u) {
-  const file = (await got(u)).body;
-  return ftlToJson(file)
-    .reduce(ftlReducer, new Map());
+  const file = await fetch(u);
+  return dataClassMap(file);
 }
 
 function ftlReducer(list, {type, id, value}) {
@@ -38,4 +38,20 @@ function ftlReducer(list, {type, id, value}) {
     list.set(dataClass, slug);
   }
   return list;
+}
+
+async function getMissingDataClasses(ftlFile) {
+  const breachDataClasses = new Set();
+  // const ftlDataClasses = getFtlDataClassesLocal(`./${ftlFile}`);
+  const ftlDataClasses = await getFtlDataClassesRemote(`https://raw.githubusercontent.com/mozilla/blurts-server/master/${ftlFile}`);
+  const breaches = await fetch(HIBP_BREACHES_URL, {json: true});
+  breaches.forEach(({DataClasses}) => DataClasses.forEach(dataClass => breachDataClasses.add(dataClass)));
+
+  const missingDataClasses = [];
+  breachDataClasses.forEach(dataClass => {
+    if (!ftlDataClasses.has(dataClass)) {
+      missingDataClasses.push(dataClass);
+    }
+  });
+  return missingDataClasses;
 }
