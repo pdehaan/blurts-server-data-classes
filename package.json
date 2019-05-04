@@ -1,6 +1,6 @@
 {
   "name": "blurts-server-data-classes",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Peter deHaan <peter@deseloper.com> (https://about.me/peterdehaan)",
   "bin": "index.js",
   "bugs": {
