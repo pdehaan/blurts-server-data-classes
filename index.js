@@ -2,14 +2,13 @@
 
 const lib = require("./lib");
 
-main("locales/en/data-classes.ftl");
+main();
 
 async function main(ftlFile) {
-  const missingDataClasses = lib.getMissingDataClasses(ftlFile);
+  const missingDataClasses = await lib.getMissingDataClasses();
   if (missingDataClasses.length) {
-    console.error(`${ftlFile}:`);
-    for (const dataClass of missingDataClasses) {
-      console.error(`  - Missing "${dataClass}"`);
+    for (const res of missingDataClasses) {
+      console.error(`Missing "${res.dataClass}" data class from ${res.breachName} breach`);
     }
     process.exitCode = 1;
   }
