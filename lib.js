@@ -14,6 +14,7 @@ async function getMissingDataClasses() {
 
   breaches.forEach(breach => {
     breach.DataClasses.forEach(dataClass => {
+      dataClass = matchFluentID(dataClass);
       if (!ftlIds.has(dataClass)) {
         missingDataClasses.push({
           dataClass,
@@ -25,7 +26,14 @@ async function getMissingDataClasses() {
   return missingDataClasses;
 }
 
-async function getHibpBreaches(breachesUrl="https://monitor.firefox.com/hibp/breaches") {
+function matchFluentID(dataCategory) {
+  return dataCategory.toLowerCase()
+    .replace(/[^-a-z0-9]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+async function getHibpBreaches(breachesUrl="https://haveibeenpwned.com/api/v2/breaches") {
   const res = await got(breachesUrl, {json: true});
   return res.body;
 }
