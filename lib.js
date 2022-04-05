@@ -39,7 +39,7 @@ async function getHibpBreaches(breachesUrl="https://haveibeenpwned.com/api/v2/br
 }
 
 async function getFTLFile(locale="en") {
-  const res = await got(`https://raw.githubusercontent.com/mozilla/blurts-server/master/locales/${locale}/data-classes.ftl`);
+  const res = await got(`https://raw.githubusercontent.com/mozilla/blurts-server/main/locales/${locale}/data-classes.ftl`);
   return parseFtl(res.body).body.filter(item => item.type === "Message");
 }
 
