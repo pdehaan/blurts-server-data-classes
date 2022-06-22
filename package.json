@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "fluent-syntax": "^0.13.0",
-    "got": "^9.6.0"
+    "got": "^11.8.5"
   },
   "homepage": "https://github.com/pdehaan/blurts-server-data-classes#readme",
   "keywords": [],
