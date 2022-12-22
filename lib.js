@@ -1,4 +1,4 @@
-const got = require("got").get;
+const got = require("got");
 const parseFtl = require("fluent-syntax").parse;
 
 module.exports = {
@@ -33,13 +33,13 @@ function matchFluentID(dataCategory) {
     .replace(/(^-|-$)/g, "");
 }
 
-async function getHibpBreaches(breachesUrl="https://haveibeenpwned.com/api/v2/breaches") {
-  const res = await got(breachesUrl, {json: true});
-  return res.body;
+async function getHibpBreaches(breachesUrl="https://haveibeenpwned.com/api/v3/breaches") {
+  const res = await got.get(breachesUrl);
+  return JSON.parse(res.body);
 }
 
 async function getFTLFile(locale="en") {
-  const res = await got(`https://raw.githubusercontent.com/mozilla/blurts-server/main/locales/${locale}/data-classes.ftl`);
+  const res = await got.get(`https://raw.githubusercontent.com/mozilla/blurts-server/main/locales/${locale}/data-classes.ftl`);
   return parseFtl(res.body).body.filter(item => item.type === "Message");
 }
 
